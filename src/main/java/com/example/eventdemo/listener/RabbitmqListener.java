@@ -7,29 +7,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 //@Component
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class RabbitmqListener {
 
-//    private final ApplicationEventPublisher applicationEventPublisher;
-//
-//    @RabbitListener(queues = "order.created", bindings = "exchange.xx")
-//    public void receiveEvent(OrderCreatedEvent event) {
-//        applicationEventPublisher.publishEvent(event);
-//    }
-//
-//}
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-
-//@Component
-//@RequiredArgsConstructor
-//public class KafkaListener {
-//
-//    private final ApplicationEventPublisher applicationEventPublisher;
-//
-//    @RabbitListener(queues = "order.created", bindings = "exchange.xx")
-//    public void receiveEvent(OrderCreatedEvent event) {
-//        applicationEventPublisher.publishEvent(event);
-//    }
-
+    @RabbitListener(queues = "order.queue")
+    public void receiveEvent(OrderCreatedEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
 
 }
