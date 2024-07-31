@@ -48,6 +48,12 @@ span.hljs-meta {
     color: #CECE0B;
 }
 
+img.xrex_logo {
+    margin: 0px;
+    border-radius: 50%;
+    width: 45px;
+}
+
 </style>
 
 ### Building Event-Driven Architecture
@@ -56,9 +62,29 @@ span.hljs-meta {
 <br>
 <p class="center">
 Stone Huang<br> 
+<img src="pics/xrexinc_logo.jpg" class="xrex_logo">
 XREX Inc.
 </p>
 
+---
+
+### About Me
+
+  Stone Huang
+
+- XREX Inc. Principal Backend Engineer
+- 金融業、電信業、系統整合商、新創軟體公司
+- 系統架構設計、分散式系統開發、區塊鏈應用、密碼學等
+- 證照 : AWS、JAVA、Microsoft SQL Server、CCNA、CKA、Neo4j及相關金融證照
+- 興趣 : 籃球，觀察生態(甲蟲類)
+
+---
+
+### Agenda
+- What is EDA
+- Spring Event Lifecycle
+- Spring Modulith Event
+- Event Error Handling
 
 ---
 
@@ -209,7 +235,7 @@ sequenceDiagram
     Producer->>Producer : start process
     Producer->>Broker: publish event
     Broker->>EventListener: notify
-    EventListener->>EventListener: failed : throw exception
+    EventListener-XEventListener: failed : throw exception
     EventListener->>Broker: throw exception
     Broker->>Producer: throw exception
     Producer->>Producer : handle or throw exception
@@ -385,7 +411,7 @@ sequenceDiagram
     EventListener->>EventListener: do something
     EventListener->>Broker: 
     Broker->>Producer: 
-    Producer->>-Producer : commit failed
+    Producer-X-Producer : commit failed
     Note right of Producer: 1. rollback transaction
 ```
 
@@ -406,7 +432,7 @@ sequenceDiagram
     EventListener->>Broker: 
     Note right of EventListener: *2. expect not execute if <BR> transaction rollback
     Broker->>Producer: 
-    Producer->>-Producer : commit failed
+    Producer-X-Producer : commit failed
     Note right of Producer: 1. rollback transaction
 ```
 
@@ -636,7 +662,7 @@ sequenceDiagram
     Producer->>Broker: publish event
     Broker->>DB: create incompleted event record
     Broker->>EventListener: notify
-    EventListener->>EventListener: do something failed
+    EventListener-XEventListener: do something failed
     Note left of DB: event record is finally incompleted
 ```
 
@@ -907,10 +933,14 @@ class SpringEventTest {
 
 - ***@EventListener*** : regular event listener. run within a single thread of producer's process.
 - ***@TransactionalEventListener*** : transaction-bound events listener. run according to transactional phase.
-- ***@ApplicationModuleListener*** : to simplify annotation. (<span class="highlight">*Recommend</span>).
-
 - ***@Async*** : run parallel.
 - ***@Order*** : control execution order of listeners.
+
+--
+
+### Recap
+
+- ***@ApplicationModuleListener*** : to simplify listener annotation. (<span class="highlight">*Recommend</span>).
 - ***@Externalized*** : enable externalize events.
 
 ---

@@ -11,3 +11,8 @@ MySQL 8 and RabbitMQ 3.
 cd docker
 docker-compose up -d
 ```
+
+Clean environment
+```
+docker-compose down
+```
