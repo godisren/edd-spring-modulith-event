@@ -61,21 +61,18 @@ img.xrex_logo {
 ### **Spring Event** and **Spring Modulith**
 <br>
 <p class="center">
-Stone Huang<br> 
-<img src="pics/xrexinc_logo.jpg" class="xrex_logo">
-XREX Inc.
+Stone Huang <br><br>
+JCConf Taiwan 2024
 </p>
 
 ---
 
-### About Me
+### About Stone Huang
 
-  Stone Huang
-
-- XREX Inc. Principal Backend Engineer
-- 金融業、電信業、系統整合商、新創軟體公司
-- 系統架構設計、分散式系統開發、區塊鏈應用、密碼學等
-- 證照 : AWS、JAVA、Microsoft SQL Server、CCNA、CKA、Neo4j及相關金融證照
+- <img src="pics/xrexinc_logo.jpg" class="xrex_logo"> XREX Inc.
+- 金融業、電信業、系統整合商、新創軟體公司等
+- 系統架構設計、分散式系統開發、區塊鏈應用等
+- 證照 : AWS、CKA、CKAD、SCJP、SCWCD、Microsoft SQL Server、CCNA、Neo4j及相關金融證照
 - 興趣 : 籃球，觀察生態(甲蟲類)
 
 ---
@@ -106,9 +103,9 @@ An event in EDA refers to a <span class="highlight">significant occurrence or ac
 
 Examples : 
 
-- Business/Domain Event (such as order created, successfully sign up)
-- System Event (application launched event)
-- Alert Event (such as price alert in exchange)
+- Business/Domain Event (e.g. order created, successfully sign up)
+- System Event (e.g. application launches or shutdown)
+- Alert Event (e.g. price alert in exchange)
 - Period Event (Cron job triggers)
 - etc
 
@@ -143,9 +140,11 @@ But, how about <span class="highlight">INTERNAL</span> events communication with
 --
 
 ### Scenario
-一個單體式的應用程式"訂單系統"，在完成訂單後需要發送信件給客戶，並且需要累計銷量供後續管理人員查詢。
+在一個沒有其它微服務的系統架構下，一個單體式的應用服務"訂單系統"，在完成訂單後
 
-此時，還沒有其他微服務可以提供發送信件，及計算累計銷量，一切都要由訂單系統本身來實作。
+- 需要發送信件給客戶
+- 並且需要累計銷量供後續管理人員查詢
+- And more in the future
 
 --
 
@@ -165,6 +164,7 @@ public class OrderService {
         orderRepository.save(order)
         notificationService.sendEmail(order);
         statisticsService.calculateOrderAmount(order);
+        // do something in the future
     }
 }
 ```
@@ -183,7 +183,8 @@ use build-in Spring Event Framework
 
 ### Spring Event Introduction
 
-Spring Event is a standard <span class="highlight">Observer design</span> pattern that implements Pub-Sub mechanism in Spring Application.
+Spring Event is a standard <span class="highlight">observer design</span> pattern that implements Pub-Sub mechanism in Spring Application. 
+A fundamental part of Spring Framework.
 
 By leveraging Spring <span class="highlight"> ***ApplicationEventPublisher*** </span> and <span class="highlight">***@EventListener***</span> and other components to achieve this goal.
 
@@ -200,24 +201,20 @@ By leveraging Spring <span class="highlight"> ***ApplicationEventPublisher*** </
 
 ### Use Spring Event Listener (1)
 
-Regular event listener
+Regular event listener (assume listener has subscribed)
 
 ```mermaid
 %%| fig-height: 6
 sequenceDiagram
     participant Producer
     participant Broker as Spring Event System
-    participant EventListener as EventListener 1
-    participant EventListener2 as EventListener 2
+    participant EventListener as EventListener
 
     Producer->>Producer : start process
     Producer->>Broker: publish event
     Broker->>EventListener: notify
     EventListener->>EventListener: do something
     EventListener->>Broker: 
-    Broker->>EventListener2: notify
-    EventListener2->>EventListener2: do something
-    EventListener2->>Broker: 
     Broker->>Producer: 
     Producer->>Producer : finish process
 ```
@@ -309,7 +306,7 @@ public class OrderEventListener2 {
 
 ### Async Event
 
-By default, regular event listener is <span class="highlight">synchronous</span>. If your operations take long time, It is better to to use <span class="highlight">asynchronous event listeners</span>.
+By default, regular event listener is <span class="highlight">synchronous runs on the same thread with producer</span>. If your operations of a listener take long time, It is better to to use <span class="highlight">asynchronous event listeners</span>.
 
 
 --
@@ -320,7 +317,7 @@ By default, regular event listener is <span class="highlight">synchronous</span>
 sequenceDiagram
     participant Producer
     participant Broker as Spring Event System
-    participant EventListener as Async EventListener 1
+    participant EventListener as Async EventListener
 
     Producer->>Producer : start proccess
     Producer->>Broker: publish event
@@ -403,7 +400,7 @@ What if the producer side failed (transaction rollback) but the listener already
 sequenceDiagram
     participant Producer
     participant Broker as Spring Event System
-    participant EventListener as EventListener 1
+    participant EventListener as EventListener
 
     Producer->>+Producer : start transaction
     Producer->>Broker: publish event
@@ -423,7 +420,7 @@ sequenceDiagram
 sequenceDiagram
     participant Producer
     participant Broker as Spring Event System
-    participant EventListener as EventListener 1
+    participant EventListener as EventListener
 
     Producer->>+Producer : start transaction
     Producer->>Broker: publish event
@@ -711,7 +708,6 @@ application.yml
 
 
 ```yaml
-
 spring:
   modulith:
     // republish incompleted event when application restart
@@ -720,7 +716,6 @@ spring:
       jdbc:
         schema-initialization:
          enabled: true  // initialize event table
-
 ```
 
 --
@@ -754,6 +749,23 @@ DEMO
 ### Question 3 
 
 How to integrate with external brokers such as KafKa, RabbitMQ from internal Spring events.
+
+--
+
+### Scenario (Original)
+在一個沒有其它微服務的系統架構下，一個單體式的應用服務"訂單系統"，在完成訂單後
+
+- 需要發送信件給客戶
+- 並且需要累計銷量供後續管理人員查詢
+
+--
+
+### Scenario (New)
+組織內開發了一個以基於RabbitMQ為架構的發送信件微服務，
+原本的"訂單系統"，在完成訂單後
+
+- ~~需要發送信件給客戶~~ <span class="highlight">發送訂單事件到RabbitMQ，由信件微服務消費發送信件給客戶</span>
+- 並且需要累計銷量供後續管理人員查詢
 
 --
 
@@ -923,7 +935,7 @@ class SpringEventTest {
 
 ### Other Topics
 - Idempotent Processing (Idempotent Key)
-- Performance
+- Spring Event Performance (see listeners' workload)
 - Documentation (e.g. Springwolf)
 - How to find/define event (e.g. DDD Event Storming)
 
