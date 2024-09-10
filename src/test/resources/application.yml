@@ -14,7 +14,7 @@ spring:
     events:
       jdbc:
         schema-initialization:
-          enabled: false
+          enabled: true
       externalization:
         enabled: false
 

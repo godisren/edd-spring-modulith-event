@@ -40,6 +40,9 @@ public class OrderEventListener1 {
 //        // send email after receive OrderCreatedEvent
 //        log.info("[ApplicationModuleListener] send email when receiving order created event [{}] ", event);
 //
-//        if (error) throw new RuntimeException("listener failed...");
+//        if (error) {
+//            log.error("run into unexpected error.");
+//            throw new RuntimeException("listener failed...");
+//        }
 //    }
 }
