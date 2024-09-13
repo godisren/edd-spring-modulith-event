@@ -26,11 +26,18 @@ public class OrderService {
 
         var createdOrder =  orderRepository.save(order);
 
-        applicationEventPublisher.publishEvent(new OrderCreatedEvent(order));
+        applicationEventPublisher.publishEvent(new OrderCreatedEvent(createdOrder));
 
-        if (error) throw new RuntimeException("failed in transaction...");
+//        simulateIfFailed();
 
         return createdOrder;
+    }
+
+    private static void simulateIfFailed() {
+        if (error) {
+            log.error("failed when create order");
+            throw new RuntimeException("failed in transaction...");
+        }
     }
 
 }
