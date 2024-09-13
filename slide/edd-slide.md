@@ -61,7 +61,10 @@ img.xrex_logo {
 ### **Spring Event** and **Spring Modulith**
 <br>
 <p class="center">
-Stone Huang <br><br>
+Stone Huang <br>
+<img src="pics/xrexinc_logo.jpg" class="xrex_logo"> XREX Inc.
+<br>
+<br>
 JCConf Taiwan 2024
 </p>
 
@@ -69,7 +72,6 @@ JCConf Taiwan 2024
 
 ### About Stone Huang
 
-- <img src="pics/xrexinc_logo.jpg" class="xrex_logo"> XREX Inc.
 - 金融業、電信業、系統整合商、新創軟體公司等
 - 系統架構設計、分散式系統開發、區塊鏈應用等
 - 證照 : AWS、CKA、CKAD、SCJP、SCWCD、Microsoft SQL Server、CCNA、Neo4j及相關金融證照
@@ -87,15 +89,14 @@ JCConf Taiwan 2024
 
 ### What is EDA
 
-<span class="highlight">Event-driven architecture (EDA)</span> is a microservice architectural pattern that utilizes asynchronous communication triggered by <span class="highlight">events</span> rather than conventional request-response patterns. 
-
+> “ <span class="highlight">Event-driven architecture (EDA)</span> is a microservice architectural pattern that utilizes asynchronous communication triggered by <span class="highlight">events</span>. 
 EDA enhances <span class="highlight">scalability, responsiveness, and real-time processing</span>, making it ideal for modern, dynamic applications <span class="highlight">across diverse domains</span>.
 
 --
 
 ### What is Event
 
-An event in EDA refers to a <span class="highlight">significant occurrence or action within a system</span>, typically triggering responses or processes.
+> “ An event in EDA refers to a <span class="highlight">significant occurrence or action within a system</span>, typically triggering responses or processes.
 
 --
 
@@ -125,13 +126,13 @@ Examples :
 
 ### Benefits of EDA
 - Loosely-coupled architecture
-- Scalibility of Consumers
+- Scalability of Consumers
 - Async processing
 - Single Responsibility Principle(SRP) and Open-Closed Principle (OCP).
 
 ---
 
-### EDA within Applicaiton
+### EDA within Application
 
 Typical EDA is a distributed system achieved by <span class="highlight"> EXTERNAL</span> events. 
 
@@ -144,7 +145,7 @@ But, how about <span class="highlight">INTERNAL</span> events communication with
 
 - 需要發送信件給客戶
 - 並且需要累計銷量供後續管理人員查詢
-- And more in the future
+- And more tasks in the future
 
 --
 
@@ -161,7 +162,7 @@ public class OrderService {
 
     @Transactional
     public void createOrder(Order order) {
-        orderRepository.save(order)
+        orderRepository.save(order);
         notificationService.sendEmail(order);
         statisticsService.calculateOrderAmount(order);
         // do something in the future
@@ -186,7 +187,8 @@ use build-in Spring Event Framework
 Spring Event is a standard <span class="highlight">observer design</span> pattern that implements Pub-Sub mechanism in Spring Application. 
 A fundamental part of Spring Framework.
 
-By leveraging Spring <span class="highlight"> ***ApplicationEventPublisher*** </span> and <span class="highlight">***@EventListener***</span> and other components to achieve this goal.
+By leveraging Spring <span class="highlight"> ***ApplicationEventPublisher*** </span> and <span class="highlight">***@EventListener***</span>
+interact with Spring Event System.
 
 --
 
@@ -296,7 +298,7 @@ public class OrderEventListener2 {
     
     @EventListener
     public void receiveAndCalculateAmount(OrderCreatedEvent event) {
-        // calculate order amountf
+        // calculate order amount
         statisticsService.calculateOrderAmount(event.getOrder());
     }
 }
@@ -306,7 +308,7 @@ public class OrderEventListener2 {
 
 ### Async Event
 
-By default, regular event listener is <span class="highlight">synchronous runs on the same thread with producer</span>. If your operations of a listener take long time, It is better to to use <span class="highlight">asynchronous event listeners</span>.
+By default, regular event listeners <span class="highlight">run synchronously in the same thread with producer</span>. If your listener operations take a long time, It is better to to use <span class="highlight">asynchronous event listeners</span>.
 
 
 --
@@ -321,8 +323,8 @@ sequenceDiagram
 
     Producer->>Producer : start proccess
     Producer->>Broker: publish event
-    Broker->>Producer: 
     Broker--)EventListener: notify (async)
+    Broker->>Producer: 
     EventListener->>EventListener: do something
     Producer->>Producer : continue proccess
 
@@ -337,13 +339,20 @@ use ***@Async***
 ```java
 @Component
 public class OrderEventListener {
-    
     @Async
     @EventListener
     public void receiveAndSendEmail(OrderCreatedEvent event) {...}
-
 }
 ```
+<br>
+
+remember to enable ***@EnableAsync***
+```java
+@EnableAsync
+@SpringBootApplication
+public class SpringApplication {}
+```
+
 
 --
 
@@ -376,6 +385,22 @@ public class OrderEventListener2 {
     @EventListener
     @Order(2)
     public void receiveAndCalculateAmount(OrderCreatedEvent event) {...}
+
+}
+```
+
+--
+
+### Event Filtering
+
+Filter event by SpEL
+
+```java
+@Component
+public class OrderEventListener1 {
+
+    @EventListener(condition = "#event.productName.equals('laptop')")
+    public void receiveAndSendEmail(OrderCreatedEvent event) {...}
 
 }
 ```
@@ -531,6 +556,23 @@ sequenceDiagram
 
 --
 
+### Use Transactional Event Listener 
+***TransactionPhase.AFTER_COMMIT*** by default
+
+```java
+@Component
+public class OrderEventListener {
+    
+    @Async   
+    @TransactionalEventListener (phase = TransactionPhase.AFTER_COMMIT)
+    public void receiveAndSendEmail(OrderCreatedEvent event) {...}
+
+}
+```
+
+
+--
+
 <p class="center">
 DEMO
 </p>
@@ -671,12 +713,14 @@ Republish incompleted event.
 ```mermaid
 sequenceDiagram
     participant Application
+    participant multicase as PersistentApplication <br> EventMulticaster 
     participant Broker as Spring Event System
     participant EventListener as EventListener
     participant DB
-    Application->>Broker: republish incompleted event
-    Broker->>DB: find incompleted event
-    DB->>Broker: 
+    Application->>multicase: republish incompleted event
+    multicase->>DB: find incompleted event
+    DB->>multicase: 
+    multicase->>Broker: notify
     Broker->>EventListener: notify
     EventListener->>Broker: 
     Broker->>DB: mark event record as completed
@@ -724,18 +768,15 @@ spring:
 
 Use ***@ApplicationModuleListener*** instead to simplify the annotation.
 ```java
+@ApplicationModuleListener
+public void receiveAndSendEmail(OrderCreatedEvent event) {...}
+```
+equals to 
+```java
 @TransactionalEventListener
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @Async
 public void receiveAndSendEmail(OrderCreatedEvent event) {...}
-
-}
-```
-Change to 
-```java
-@ApplicationModuleListener
-public void receiveAndSendEmail(OrderCreatedEvent event) {...}
-
 ```
 
 --
@@ -764,7 +805,7 @@ How to integrate with external brokers such as KafKa, RabbitMQ from internal Spr
 組織內開發了一個以基於RabbitMQ為架構的發送信件微服務，
 原本的"訂單系統"，在完成訂單後
 
-- ~~需要發送信件給客戶~~ <span class="highlight">發送訂單事件到RabbitMQ，由信件微服務消費發送信件給客戶</span>
+- ~~需要發送信件給客戶~~ <span class="highlight">發送訂單事件到RabbitMQ，由信件微服務負責發送信件給客戶</span>
 - 並且需要累計銷量供後續管理人員查詢
 
 --
@@ -790,7 +831,9 @@ public class OrderEventListener1 {
 --
 
 ### Integrate with external brokers (2)
-Approach 2 : use <span class="highlight">Spring Modulith Externalizing Events</span>. Now it supports external borkers ***Kafka, AMQP, JMS, SQS, SNS (Redis is possible in the future)***.
+Approach 2 : use <span class="highlight">Spring Modulith Externalizing Events</span>
+
+Now it supports external borkers ***Kafka, AMQP, JMS, SQS, SNS (Redis is possible in the future)***.
 
 --
 
@@ -846,7 +889,7 @@ use ***@Externalized*** on your event object
 
 ### Externalizing Events (3)
 
-For Example
+For example:
 
 RabbitMQ exchange name : `order.created`
 ```java
