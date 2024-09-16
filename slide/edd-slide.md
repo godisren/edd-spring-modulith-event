@@ -3,7 +3,7 @@ title: Building EDA with Spring Event and Spring Modulith
 theme: "beige"
 # theme: "night"
 transition: "slide"
-# slideNumber: true
+slideNumber: true
 enableMenu: false
 ---
 
@@ -90,13 +90,13 @@ JCConf Taiwan 2024
 ### What is EDA
 
 > “ <span class="highlight">Event-driven architecture (EDA)</span> is a microservice architectural pattern that utilizes asynchronous communication triggered by <span class="highlight">events</span>. 
-EDA enhances <span class="highlight">scalability, responsiveness, and real-time processing</span>, making it ideal for modern, dynamic applications <span class="highlight">across diverse domains</span>.
+EDA enhances <span class="highlight">scalability, responsiveness, and real-time processing</span>, making it ideal for modern, dynamic applications <span class="highlight">across diverse domains</span>. ”
 
 --
 
 ### What is Event
 
-> “ An event in EDA refers to a <span class="highlight">significant occurrence or action within a system</span>, typically triggering responses or processes.
+> “ An event in EDA refers to a <span class="highlight">significant occurrence or action within a system</span>, typically triggering responses or processes. ”
 
 --
 
@@ -202,8 +202,9 @@ interact with Spring Event System.
 --
 
 ### Use Spring Event Listener (1)
-
-Regular event listener (assume listener has subscribed)
+<p class="center">
+Regular event listener
+</p>
 
 ```mermaid
 %%| fig-height: 6
@@ -308,7 +309,7 @@ public class OrderEventListener2 {
 
 ### Async Event
 
-By default, regular event listeners <span class="highlight">run synchronously in the same thread with producer</span>. If your listener operations take a long time, It is better to to use <span class="highlight">asynchronous event listeners</span>.
+By default, regular event listeners <span class="highlight">run synchronously in the same thread with producer</span>. If your listener operations take a long time, It is better to use <span class="highlight">asynchronous event listeners</span>.
 
 
 --
@@ -833,7 +834,7 @@ public class OrderEventListener1 {
 ### Integrate with external brokers (2)
 Approach 2 : use <span class="highlight">Spring Modulith Externalizing Events</span>
 
-Now it supports external borkers ***Kafka, AMQP, JMS, SQS, SNS (Redis is possible in the future)***.
+Now it supports external brokers ***Kafka, AMQP, JMS, SQS, SNS (Redis is possible in the future)***.
 
 --
 
