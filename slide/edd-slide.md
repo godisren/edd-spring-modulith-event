@@ -76,6 +76,7 @@ JCConf Taiwan 2024
 - 系統架構設計、分散式系統開發、區塊鏈應用等
 - 證照 : AWS、CKA、CKAD、SCJP、SCWCD、Microsoft SQL Server、CCNA、Neo4j及相關金融證照
 - 興趣 : 籃球，觀察生態(甲蟲類)
+<img src="./pics/all_in_one.png">
 
 ---
 
