@@ -37,12 +37,16 @@ public class OrderEventListener1 {
 //
 //    @ApplicationModuleListener
 //    public void receiveAndSendEmail(OrderCreatedEvent event) {
-//        // send email after receive OrderCreatedEvent
-//        log.info("[ApplicationModuleListener] send email when receiving order created event [{}] ", event);
+//
+//        log.info("notification service received order created event [{}] ", event);
 //
 //        if (error) {
 //            log.error("run into unexpected error.");
 //            throw new RuntimeException("listener failed...");
 //        }
+//
+//        // send email after receive OrderCreatedEvent
+//        log.info("[ApplicationModuleListener] send email when receiving order created event [{}] ", event);
+//
 //    }
 }
