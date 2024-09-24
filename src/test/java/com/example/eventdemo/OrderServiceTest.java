@@ -5,6 +5,7 @@ import com.example.eventdemo.event.OrderCreatedEvent;
 import com.example.eventdemo.listener.OrderEventListener1;
 import com.example.eventdemo.repository.OrderRepository;
 import com.example.eventdemo.service.OrderService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,11 @@ class OrderServiceTest {
     @Autowired
     PersistentApplicationEventMulticaster multicaster;
 
+    @AfterEach
+    public void teardown() {
+        waitForInSeconds(3);
+    }
+
     @Test
     void createOrder() {
 
@@ -48,8 +54,6 @@ class OrderServiceTest {
 
         long numEventsOfCreated = events.stream(OrderCreatedEvent.class).count();
         assertEquals(1, numEventsOfCreated);
-
-        waitForInSeconds(3);
     }
 
     @Test
@@ -59,8 +63,6 @@ class OrderServiceTest {
         OrderService.error = true;
 
         assertThrows(RuntimeException.class, () -> orderService.createOrder(generateOrder()));
-
-
     }
 
     @Test
@@ -73,6 +75,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("republish incompleted event")
     void resubmitIncompletePublications() {
 
         OrderEventListener1.error = false;
