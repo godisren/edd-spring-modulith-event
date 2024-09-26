@@ -209,20 +209,6 @@ interact with Spring Event System.
 
 --
 
-```mermaid
-%%{init: { 'fontSize' : 30, 'sequence': {'mirrorActors':false} }}%%
-sequenceDiagram
-    Producer->>Producer : start process
-    Producer->>Broker: publish event
-    Broker->>EventListener: notify
-    EventListener->>EventListener: do something
-    EventListener->>Broker: 
-    Broker->>Producer: 
-    Producer->>Producer : finish process
-```
-
---
-
 ### Use Spring Event Listener (1) - Regular event listener
 
 ```mermaid
